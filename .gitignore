@@ -1,0 +1,105 @@
+# IDE and Editor
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build and Gradle
+build/
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# Maven
+target/
+.mvn/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Node (if frontend uses Node)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Log files
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+application-prod.yml
+*.keystore
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+out/
+bin/
+dist/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+.apt_generated
+
+# VS Code
+.vscode/
+.history/
+
+# Ignored directories
+node_modules/
+dist/
+coverage/
+
+# Production files
+.next/
+.nuxt/
+.cache/
+.vuepress/dist/
+
+# Secrets
+.ssh/
+*.pem
+*.key
+.credentials/
+secrets.json

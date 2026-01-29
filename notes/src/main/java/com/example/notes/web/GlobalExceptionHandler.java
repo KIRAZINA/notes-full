@@ -49,11 +49,18 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.fail(new ApiResponse.ApiError("validation_error", msg)));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<?>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail(new ApiResponse.ApiError("invalid_request", ex.getMessage())));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleGeneric(Exception ex) {
         ex.printStackTrace();
+        String message = ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred";
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.fail(new ApiResponse.ApiError("internal_error", ex.getMessage())));
+                .body(ApiResponse.fail(new ApiResponse.ApiError("internal_error", message)));
     }
 
 }

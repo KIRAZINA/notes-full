@@ -30,22 +30,23 @@ class NoteControllerIntegrationTest {
         mockMvc.perform(post("/api/notes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("Authorization", "Bearer test-jwt-token")) // здесь можно подставить реальный токен или замокать Security
-                .andExpect(status().isOk())
+                        .header("Authorization", "Bearer test-jwt-token"))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.title").value("Integration test note"));
     }
 
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
-    void createNote_shouldReturnNoteResponse() throws Exception {
+    void createNote_shouldReturnApiResponse() throws Exception {
         var request = new NoteCreateRequest("Test note", "Some content");
 
         mockMvc.perform(post("/api/notes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Test note"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.title").value("Test note"));
     }
 
 }

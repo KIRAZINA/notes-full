@@ -3,6 +3,7 @@ package com.example.notes.web;
 import com.example.notes.tag.Tag;
 import com.example.notes.tag.TagService;
 import com.example.notes.user.AppUserDetails;
+import com.example.notes.web.dto.ApiResponse;
 import com.example.notes.web.dto.TagCreateRequest;
 import com.example.notes.web.dto.TagResponse;
 import com.example.notes.web.mapper.TagMapper;
@@ -27,22 +28,23 @@ public class TagController {
     }
 
     @PostMapping
-    public TagResponse create(@AuthenticationPrincipal AppUserDetails principal,
+    public ApiResponse<TagResponse> create(@AuthenticationPrincipal AppUserDetails principal,
                               @RequestBody TagCreateRequest req) {
         Tag tag = tagService.createTag(principal.getId(), req.name());
-        return tagMapper.toResponse(tag);
+        return ApiResponse.ok(tagMapper.toResponse(tag));
     }
 
     @GetMapping
-    public List<TagResponse> list(@AuthenticationPrincipal AppUserDetails principal) {
-        return tagService.listTags(principal.getId()).stream()
+    public ApiResponse<List<TagResponse>> list(@AuthenticationPrincipal AppUserDetails principal) {
+        return ApiResponse.ok(tagService.listTags(principal.getId()).stream()
                 .map(tagMapper::toResponse)
-                .toList();
+                .toList());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@AuthenticationPrincipal AppUserDetails principal,
+    public ApiResponse<Void> delete(@AuthenticationPrincipal AppUserDetails principal,
                        @PathVariable Long id) {
         tagService.deleteTag(principal.getId(), id);
+        return ApiResponse.ok(null);
     }
 }

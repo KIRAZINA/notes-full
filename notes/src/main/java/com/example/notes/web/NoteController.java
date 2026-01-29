@@ -9,6 +9,8 @@ import com.example.notes.web.mapper.NoteMapper;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,30 +60,31 @@ public class NoteController {
      * Create a new note.
      */
     @PostMapping
-    public NoteResponse create(
+    public ResponseEntity<ApiResponse<NoteResponse>> create(
             @AuthenticationPrincipal AppUserDetails principal,
             @RequestBody @Valid NoteCreateRequest req
     ) {
         var note = noteService.createNote(principal.getId(), req.title(), req.content());
-        return noteMapper.toResponse(note);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok(noteMapper.toResponse(note)));
     }
 
     /**
      * Get a single note by ID.
      */
     @GetMapping("/{id}")
-    public NoteResponse get(
+    public ApiResponse<NoteResponse> get(
             @AuthenticationPrincipal AppUserDetails principal,
             @PathVariable Long id
     ) {
-        return noteMapper.toResponse(noteService.getNote(principal.getId(), id));
+        return ApiResponse.ok(noteMapper.toResponse(noteService.getNote(principal.getId(), id)));
     }
 
     /**
      * Update an existing note.
      */
     @PutMapping("/{id}")
-    public NoteResponse update(
+    public ApiResponse<NoteResponse> update(
             @AuthenticationPrincipal AppUserDetails principal,
             @PathVariable Long id,
             @RequestBody @Valid NoteUpdateRequest req
@@ -91,17 +94,18 @@ public class NoteController {
                 req.title(), req.content(),
                 req.pinned(), req.archived(), req.trashed()
         );
-        return noteMapper.toResponse(note);
+        return ApiResponse.ok(noteMapper.toResponse(note));
     }
 
     /**
      * Delete a note by ID.
      */
     @DeleteMapping("/{id}")
-    public void delete(
+    public ResponseEntity<ApiResponse<Void>> delete(
             @AuthenticationPrincipal AppUserDetails principal,
             @PathVariable Long id
     ) {
         noteService.deleteNote(principal.getId(), id);
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

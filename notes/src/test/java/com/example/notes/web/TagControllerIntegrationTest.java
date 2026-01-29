@@ -23,7 +23,7 @@ class TagControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void createTag_shouldReturnTagResponse() throws Exception {
+    void createTag_shouldReturnApiResponse() throws Exception {
         TagCreateRequest request = new TagCreateRequest("work");
 
         mockMvc.perform(post("/api/tags")
@@ -31,7 +31,8 @@ class TagControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer test-jwt-token"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("work"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.name").value("work"));
     }
 
     @Test
@@ -39,6 +40,7 @@ class TagControllerIntegrationTest {
         mockMvc.perform(get("/api/tags")
                         .header("Authorization", "Bearer test-jwt-token"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray());
     }
 }

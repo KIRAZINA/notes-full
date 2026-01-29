@@ -25,23 +25,25 @@ class NoteTagControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void addTag_shouldReturnNoteResponse() throws Exception {
+    void addTag_shouldReturnApiResponse() throws Exception {
         mockMvc.perform(post("/api/notes/{id}/tags/{tagId}", 1, 5)
                         .header("Authorization", "Bearer test-jwt-token"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1));
     }
 
     @Test
-    void removeTag_shouldReturnNoteResponse() throws Exception {
+    void removeTag_shouldReturnApiResponse() throws Exception {
         mockMvc.perform(delete("/api/notes/{id}/tags/{tagId}", 1, 5)
                         .header("Authorization", "Bearer test-jwt-token"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1));
     }
 
     @Test
-    void setTags_shouldReturnNoteResponse() throws Exception {
+    void setTags_shouldReturnApiResponse() throws Exception {
         NoteTagsSetRequest request = new NoteTagsSetRequest(List.of(5L, 6L));
 
         mockMvc.perform(put("/api/notes/{id}/tags", 1)
@@ -49,6 +51,7 @@ class NoteTagControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer test-jwt-token"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1));
     }
 }

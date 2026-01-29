@@ -49,6 +49,7 @@ public class TagService {
     public Tag getOwnedTagOrThrow(Long ownerId, Long tagId) {
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new NotFoundException("Tag not found"));
+        // Verify ownership: return same error message to avoid information leakage
         if (!tag.getOwnerId().equals(ownerId)) {
             throw new NotFoundException("Tag not found");
         }

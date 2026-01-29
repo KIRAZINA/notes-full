@@ -1,20 +1,20 @@
 -- src/main/resources/db/migration/V2__tags.sql
+-- This migration file is DEPRECATED since tags are now created in V1__init.sql
+-- with proper UNIQUE constraint (owner_id, name) and CASCADE delete.
+-- Keeping this file for reference but all operations moved to V1.
 
-CREATE TABLE IF NOT EXISTS tags (
-    id BIGSERIAL PRIMARY KEY,
-    owner_id BIGINT NOT NULL,
-    name VARCHAR(64) NOT NULL,
-    CONSTRAINT uq_tag_owner_name UNIQUE (owner_id, name)
-);
+-- NOTE: If you're upgrading from an old version where tags weren't in V1:
+-- Uncomment the lines below to add missing constraints:
 
-CREATE TABLE IF NOT EXISTS note_tags (
-    note_id BIGINT NOT NULL,
-    tag_id BIGINT NOT NULL,
-    CONSTRAINT fk_note_tags_note FOREIGN KEY (note_id) REFERENCES notes (id) ON DELETE CASCADE,
-    CONSTRAINT fk_note_tags_tag FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE,
-    CONSTRAINT uq_note_tag UNIQUE (note_id, tag_id)
-);
+-- Add missing UNIQUE constraint if it doesn't exist (idempotent approach):
+-- ALTER TABLE tags 
+-- ADD CONSTRAINT uq_tag_owner_name UNIQUE (owner_id, name) 
+-- WHERE NOT EXISTS (...);
 
-CREATE INDEX IF NOT EXISTS idx_tags_owner ON tags (owner_id);
-CREATE INDEX IF NOT EXISTS idx_note_tags_note ON note_tags (note_id);
-CREATE INDEX IF NOT EXISTS idx_note_tags_tag ON note_tags (tag_id);
+-- Add CASCADE delete if missing:
+-- ALTER TABLE note_tags DROP CONSTRAINT fk_note_tags_note;
+-- ALTER TABLE note_tags ADD CONSTRAINT fk_note_tags_note 
+--   FOREIGN KEY (note_id) REFERENCES notes (id) ON DELETE CASCADE;
+-- ALTER TABLE note_tags DROP CONSTRAINT fk_note_tags_tag;
+-- ALTER TABLE note_tags ADD CONSTRAINT fk_note_tags_tag 
+--   FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE;

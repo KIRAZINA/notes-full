@@ -3,8 +3,10 @@ package com.example.notes.web;
 import com.example.notes.note.Note;
 import com.example.notes.note.NoteActionService;
 import com.example.notes.user.AppUserDetails;
+import com.example.notes.web.dto.ApiResponse;
 import com.example.notes.web.dto.NoteResponse;
 import com.example.notes.web.mapper.NoteMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,36 +26,37 @@ public class NoteActionController {
     }
 
     @PostMapping("/{id}/archive")
-    public NoteResponse archive(@AuthenticationPrincipal AppUserDetails principal,
+    public ApiResponse<NoteResponse> archive(@AuthenticationPrincipal AppUserDetails principal,
                                 @PathVariable Long id) {
         Note note = noteActionService.moveToArchive(principal.getId(), id);
-        return noteMapper.toResponse(note);
+        return ApiResponse.ok(noteMapper.toResponse(note));
     }
 
     @PostMapping("/{id}/restore-archive")
-    public NoteResponse restoreArchive(@AuthenticationPrincipal AppUserDetails principal,
+    public ApiResponse<NoteResponse> restoreArchive(@AuthenticationPrincipal AppUserDetails principal,
                                        @PathVariable Long id) {
         Note note = noteActionService.restoreFromArchive(principal.getId(), id);
-        return noteMapper.toResponse(note);
+        return ApiResponse.ok(noteMapper.toResponse(note));
     }
 
     @PostMapping("/{id}/trash")
-    public NoteResponse trash(@AuthenticationPrincipal AppUserDetails principal,
+    public ApiResponse<NoteResponse> trash(@AuthenticationPrincipal AppUserDetails principal,
                               @PathVariable Long id) {
         Note note = noteActionService.moveToTrash(principal.getId(), id);
-        return noteMapper.toResponse(note);
+        return ApiResponse.ok(noteMapper.toResponse(note));
     }
 
     @PostMapping("/{id}/restore-trash")
-    public NoteResponse restoreTrash(@AuthenticationPrincipal AppUserDetails principal,
+    public ApiResponse<NoteResponse> restoreTrash(@AuthenticationPrincipal AppUserDetails principal,
                                      @PathVariable Long id) {
         Note note = noteActionService.restoreFromTrash(principal.getId(), id);
-        return noteMapper.toResponse(note);
+        return ApiResponse.ok(noteMapper.toResponse(note));
     }
 
     @DeleteMapping("/{id}/permanent")
-    public void deletePermanent(@AuthenticationPrincipal AppUserDetails principal,
+    public ResponseEntity<ApiResponse<Void>> deletePermanent(@AuthenticationPrincipal AppUserDetails principal,
                                 @PathVariable Long id) {
         noteActionService.deletePermanently(principal.getId(), id);
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

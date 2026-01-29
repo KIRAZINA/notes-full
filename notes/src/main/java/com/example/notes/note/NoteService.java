@@ -40,6 +40,13 @@ public class NoteService {
 
 
     public Note createNote(Long ownerId, String title, String content) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Title cannot be empty");
+        }
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("Content cannot be empty");
+        }
+        
         User owner = userService.getByIdOrThrow(ownerId);
         Note note = Note.builder()
                 .owner(owner)
@@ -63,21 +70,31 @@ public class NoteService {
                                 List<Long> tagIds) {
         User owner = userService.getByIdOrThrow(ownerId);
 
-        if (archived != null) return noteRepository.findByOwnerAndArchived(owner, archived, pageable);
-        if (trashed != null) return noteRepository.findByOwnerAndTrashed(owner, trashed, pageable);
-        if (pinned != null) return noteRepository.findByOwnerAndPinned(owner, pinned, pageable);
-
-        if (tagIds != null && !tagIds.isEmpty()) {
-            return tagIds.size() == 1
-                    ? noteRepository.findByOwnerAndTagId(owner, tagIds.get(0), pageable)
-                    : noteRepository.findByOwnerAndAllTagIds(owner, tagIds, tagIds.size(), pageable);
+        // Priority: process filters in order
+        if (archived != null) {
+            return noteRepository.findByOwnerAndArchived(owner, archived, pageable);
+        }
+        if (trashed != null) {
+            return noteRepository.findByOwnerAndTrashed(owner, trashed, pageable);
+        }
+        if (pinned != null) {
+            return noteRepository.findByOwnerAndPinned(owner, pinned, pageable);
         }
 
+        // Filter by tags (if provided and not empty)
+        if (tagIds != null && !tagIds.isEmpty()) {
+            if (tagIds.size() == 1) {
+                return noteRepository.findByOwnerAndTagId(owner, tagIds.get(0), pageable);
+            }
+            return noteRepository.findByOwnerAndAllTagIds(owner, tagIds, tagIds.size(), pageable);
+        }
+
+        // Combined search (title + content)
         if (query != null && !query.isBlank()) {
-            // Combined search regardless of inContent flag
             return noteRepository.searchTitleOrContent(owner, query, pageable);
         }
 
+        // Default: return all notes for owner
         return noteRepository.findByOwner(owner, pageable);
     }
 
@@ -116,8 +133,13 @@ public class NoteService {
     }
 
     public Note addTag(Long ownerId, Long noteId, Long tagId) {
+        if (tagId == null || tagId <= 0) {
+            throw new IllegalArgumentException("Tag ID must be a positive number");
+        }
         Note note = getNote(ownerId, noteId);
-        if (note.isTrashed()) throw new IllegalArgumentException("Cannot tag trashed note");
+        if (note.isTrashed()) {
+            throw new IllegalArgumentException("Cannot tag trashed note");
+        }
         Tag tag = tagService.getOwnedTagOrThrow(ownerId, tagId);
         note.getTags().add(tag);
         note.setUpdatedAt(Instant.now());
@@ -125,6 +147,9 @@ public class NoteService {
     }
 
     public Note removeTag(Long ownerId, Long noteId, Long tagId) {
+        if (tagId == null || tagId <= 0) {
+            throw new IllegalArgumentException("Tag ID must be a positive number");
+        }
         Note note = getNote(ownerId, noteId);
         Tag tag = tagService.getOwnedTagOrThrow(ownerId, tagId);
         note.getTags().remove(tag);
@@ -134,12 +159,30 @@ public class NoteService {
 
     /**
      * Replaces note tags with the given set (owned by the user).
+     * Validates that tag list is not null and all tags exist.
      */
     public Note setTags(Long ownerId, Long noteId, List<Long> tagIds) {
+        if (tagIds == null) {
+            throw new IllegalArgumentException("Tag IDs list cannot be null");
+        }
+        if (tagIds.isEmpty()) {
+            // Allow empty tags - clears all tags from note
+            Note note = getNote(ownerId, noteId);
+            note.setTags(new HashSet<>());
+            note.setUpdatedAt(Instant.now());
+            return noteRepository.save(note);
+        }
+        
         Note note = getNote(ownerId, noteId);
-        if (note.isTrashed()) throw new IllegalArgumentException("Cannot tag trashed note");
+        if (note.isTrashed()) {
+            throw new IllegalArgumentException("Cannot tag trashed note");
+        }
+        
         Set<Tag> newTags = new HashSet<>();
         for (Long tagId : tagIds) {
+            if (tagId == null || tagId <= 0) {
+                throw new IllegalArgumentException("Tag ID must be a positive number");
+            }
             newTags.add(tagService.getOwnedTagOrThrow(ownerId, tagId));
         }
         note.setTags(newTags);

@@ -66,14 +66,18 @@ async function createNote() {
 
     console.log("Response status:", res.status);
     console.log("Response headers:", [...res.headers.entries()]);
-    const text = await res.text();
-    console.log("Response body:", text);
+    const data = await res.json();
+    console.log("Response body:", data);
 
     if (!res.ok) {
       alert("Error creating note: " + res.status);
       return;
     }
 
+    // Clear form
+    document.getElementById("note-title").value = "";
+    document.getElementById("note-content").value = "";
+    
     loadNotes();
   } catch (e) {
     console.error("Network error:", e);

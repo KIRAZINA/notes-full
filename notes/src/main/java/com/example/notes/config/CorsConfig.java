@@ -1,24 +1,15 @@
 package com.example.notes.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-@Configuration
+/**
+ * DEPRECATED: CORS configuration has been consolidated into SecurityConfig.
+ * This file is kept for reference but should be deleted.
+ * 
+ * The CorsConfigurationSource bean is now defined in SecurityConfig.java
+ * to avoid conflicts between WebMvcConfigurer and SecurityFilterChain CORS configurations.
+ * 
+ * This approach ensures a single source of truth for CORS settings.
+ */
+@Deprecated(forRemoval = true)
 public class CorsConfig {
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:5500") // твой фронт
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
-    }
+    // CORS configuration moved to SecurityConfig.corsConfigurationSource()
 }

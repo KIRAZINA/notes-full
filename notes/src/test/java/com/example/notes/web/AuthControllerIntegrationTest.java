@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 /**
  * Integration tests for AuthController.
@@ -101,10 +102,11 @@ class AuthControllerIntegrationTest {
         when(userMapper.toResponse(user)).thenReturn(response);
 
         mockMvc.perform(get("/api/auth/me")
-                        .principal(() -> "john"))
+                        .with(user(principal)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("john"))
-                .andExpect(jsonPath("$.email").value("john@example.com"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.username").value("john"))
+                .andExpect(jsonPath("$.data.email").value("john@example.com"));
     }
 
 }

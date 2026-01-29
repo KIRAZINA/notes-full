@@ -22,40 +22,45 @@ class NoteActionControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
-    void archiveNote_shouldReturnNoteResponse() throws Exception {
+    void archiveNote_shouldReturnApiResponse() throws Exception {
         mockMvc.perform(post("/api/notes/{id}/archive", 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1));
     }
 
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
-    void restoreArchive_shouldReturnNoteResponse() throws Exception {
+    void restoreArchive_shouldReturnApiResponse() throws Exception {
         mockMvc.perform(post("/api/notes/{id}/restore-archive", 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1));
     }
 
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
-    void moveToTrash_shouldReturnNoteResponse() throws Exception {
+    void moveToTrash_shouldReturnApiResponse() throws Exception {
         mockMvc.perform(post("/api/notes/{id}/trash", 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1));
     }
 
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
-    void restoreFromTrash_shouldReturnNoteResponse() throws Exception {
+    void restoreFromTrash_shouldReturnApiResponse() throws Exception {
         mockMvc.perform(post("/api/notes/{id}/restore-trash", 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1));
     }
 
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
     void deletePermanent_shouldReturnOk() throws Exception {
         mockMvc.perform(delete("/api/notes/{id}/permanent", 1))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
     }
 }
