@@ -9,6 +9,14 @@
 *~
 .DS_Store
 
+# Internal documentation (not for GitHub)
+BUGFIXES_REPORT.md
+COMPLETION_SUMMARY.md
+FINAL_REPORT.md
+LOCALIZATION_REPORT.md
+RUNNING_INSTRUCTIONS.md
+GITHUB_DEPLOYMENT_CHECKLIST.md
+
 # Build and Gradle
 build/
 .gradle/
