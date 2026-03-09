@@ -9,6 +9,11 @@ spring:
 server:
   port: 8080
 
+security:
+  jwt:
+    secret: ${JWT_SECRET:SET_JWT_SECRET_IN_ENVIRONMENT_MIN_32_CHARS}
+    expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
 logging:
   level:
     root: INFO

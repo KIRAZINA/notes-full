@@ -1,7 +1,7 @@
 package com.example.notes.web.dto;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 
 /**
@@ -9,6 +9,5 @@ import java.util.List;
  */
 public record NoteTagsSetRequest(
         @NotNull(message = "Tag IDs cannot be null")
-        @NotEmpty(message = "Tag IDs cannot be empty")
-        List<Long> tagIds
+        List<@NotNull(message = "Tag ID cannot be null") @Positive(message = "Tag ID must be positive") Long> tagIds
 ) {}

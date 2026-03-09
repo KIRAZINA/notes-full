@@ -7,6 +7,7 @@ import com.example.notes.web.dto.ApiResponse;
 import com.example.notes.web.dto.NoteBatchRequest;
 import com.example.notes.web.dto.NoteResponse;
 import com.example.notes.web.mapper.NoteMapper;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,35 +30,35 @@ public class NoteBatchController {
 
     @PostMapping("/archive")
     public ApiResponse<List<NoteResponse>> archive(@AuthenticationPrincipal AppUserDetails principal,
-                                                   @RequestBody NoteBatchRequest req) {
+                                                   @RequestBody @Valid NoteBatchRequest req) {
         List<Note> notes = noteBatchService.archiveNotes(principal.getId(), req.noteIds());
         return ApiResponse.ok(notes.stream().map(noteMapper::toResponse).toList());
     }
 
     @PostMapping("/restore-archive")
     public ApiResponse<List<NoteResponse>> restoreArchive(@AuthenticationPrincipal AppUserDetails principal,
-                                                          @RequestBody NoteBatchRequest req) {
+                                                          @RequestBody @Valid NoteBatchRequest req) {
         List<Note> notes = noteBatchService.restoreFromArchive(principal.getId(), req.noteIds());
         return ApiResponse.ok(notes.stream().map(noteMapper::toResponse).toList());
     }
 
     @PostMapping("/trash")
     public ApiResponse<List<NoteResponse>> trash(@AuthenticationPrincipal AppUserDetails principal,
-                                                 @RequestBody NoteBatchRequest req) {
+                                                 @RequestBody @Valid NoteBatchRequest req) {
         List<Note> notes = noteBatchService.trashNotes(principal.getId(), req.noteIds());
         return ApiResponse.ok(notes.stream().map(noteMapper::toResponse).toList());
     }
 
     @PostMapping("/restore-trash")
     public ApiResponse<List<NoteResponse>> restoreTrash(@AuthenticationPrincipal AppUserDetails principal,
-                                                        @RequestBody NoteBatchRequest req) {
+                                                        @RequestBody @Valid NoteBatchRequest req) {
         List<Note> notes = noteBatchService.restoreFromTrash(principal.getId(), req.noteIds());
         return ApiResponse.ok(notes.stream().map(noteMapper::toResponse).toList());
     }
 
     @DeleteMapping("/permanent")
     public ApiResponse<Void> deletePermanent(@AuthenticationPrincipal AppUserDetails principal,
-                                             @RequestBody NoteBatchRequest req) {
+                                             @RequestBody @Valid NoteBatchRequest req) {
         noteBatchService.deletePermanently(principal.getId(), req.noteIds());
         return ApiResponse.ok(null);
     }

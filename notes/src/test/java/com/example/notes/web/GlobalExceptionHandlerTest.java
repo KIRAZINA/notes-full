@@ -74,6 +74,6 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<ApiResponse<?>> response = handler.handleGeneric(new RuntimeException("Unexpected error"));
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(response.getBody().error().code()).isEqualTo("internal_error");
-        assertThat(response.getBody().error().message()).contains("Unexpected error");
+        assertThat(response.getBody().error().message()).isEqualTo("An unexpected error occurred");
     }
 }

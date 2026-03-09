@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -23,24 +24,37 @@ class TagControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @WithMockUser(username = "testuser", roles = {"USER"})
     void createTag_shouldReturnApiResponse() throws Exception {
         TagCreateRequest request = new TagCreateRequest("work");
 
         mockMvc.perform(post("/api/tags")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .header("Authorization", "Bearer test-jwt-token"))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.name").value("work"));
     }
 
     @Test
+    @WithMockUser(username = "testuser", roles = {"USER"})
     void listTags_shouldReturnArray() throws Exception {
-        mockMvc.perform(get("/api/tags")
-                        .header("Authorization", "Bearer test-jwt-token"))
+        mockMvc.perform(get("/api/tags"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser", roles = {"USER"})
+    void createTag_withBlankName_shouldReturnValidationError() throws Exception {
+        TagCreateRequest request = new TagCreateRequest(" ");
+
+        mockMvc.perform(post("/api/tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("validation_error"));
     }
 }

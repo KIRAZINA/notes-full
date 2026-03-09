@@ -20,6 +20,7 @@ GITHUB_DEPLOYMENT_CHECKLIST.md
 # Build and Gradle
 build/
 .gradle/
+notes/.gradle-home/
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache

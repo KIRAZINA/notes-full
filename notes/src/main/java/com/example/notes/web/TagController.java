@@ -7,6 +7,7 @@ import com.example.notes.web.dto.ApiResponse;
 import com.example.notes.web.dto.TagCreateRequest;
 import com.example.notes.web.dto.TagResponse;
 import com.example.notes.web.mapper.TagMapper;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class TagController {
 
     @PostMapping
     public ApiResponse<TagResponse> create(@AuthenticationPrincipal AppUserDetails principal,
-                              @RequestBody TagCreateRequest req) {
+                              @RequestBody @Valid TagCreateRequest req) {
         Tag tag = tagService.createTag(principal.getId(), req.name());
         return ApiResponse.ok(tagMapper.toResponse(tag));
     }

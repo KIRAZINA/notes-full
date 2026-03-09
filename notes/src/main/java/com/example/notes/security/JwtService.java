@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -29,9 +30,12 @@ public class JwtService {
             @Value("${security.jwt.secret}") String secret,
             @Value("${security.jwt.expiration-ms}") long expirationMs
     ) {
+        if (!StringUtils.hasText(secret) || secret.startsWith("SET_JWT_SECRET_IN_ENVIRONMENT")) {
+            throw new IllegalStateException("JWT secret is not configured. Set JWT_SECRET environment variable.");
+        }
         // Key must be at least 256 bits (32 bytes) for HS256
         if (secret.length() < 32) {
-            log.warn("JWT secret is shorter than recommended 32 chars. Minimum is 32 for HS256.");
+            throw new IllegalStateException("JWT secret must be at least 32 characters.");
         }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;

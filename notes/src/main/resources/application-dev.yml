@@ -27,5 +27,4 @@ spring:
 
 security:
   jwt:
-    secret: my-super-secret-key-which-is-long-enough-123456
-    expiration-ms: 86400000
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}

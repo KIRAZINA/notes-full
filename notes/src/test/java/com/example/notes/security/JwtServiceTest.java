@@ -31,4 +31,18 @@ class JwtServiceTest {
     void isValid_shouldReturnFalseForInvalidToken() {
         assertThat(jwtService.isValid("invalid.token.value")).isFalse();
     }
+
+    @Test
+    void constructor_shouldFailFastWhenSecretIsPlaceholder() {
+        assertThatThrownBy(() -> new JwtService("SET_JWT_SECRET_IN_ENVIRONMENT_MIN_32_CHARS", expirationMs))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("JWT secret is not configured");
+    }
+
+    @Test
+    void constructor_shouldFailFastWhenSecretTooShort() {
+        assertThatThrownBy(() -> new JwtService("short-secret", expirationMs))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("at least 32");
+    }
 }

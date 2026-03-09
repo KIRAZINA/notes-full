@@ -1,0 +1,4 @@
+security:
+  jwt:
+    secret: test-jwt-secret-for-tests-at-least-32-chars
+    expiration-ms: 3600000
