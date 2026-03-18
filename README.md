@@ -19,26 +19,22 @@ A backend-only note management service built with Java and Spring Boot.
 - Flyway migrations
 - H2 (dev), PostgreSQL (runtime option)
 - Gradle Wrapper
+- Docker
 
 ## Security Model
 - Bearer token auth only (no HTTP Basic)
-- JWT secret is read from environment variables
-- Fail-fast startup if JWT secret is missing/invalid
+- JWT secret can be overridden from environment variables
+- Local development has a valid default JWT secret
 - Unified JSON security errors:
   - `401` -> `error.code = "unauthorized"`
   - `403` -> `error.code = "forbidden"`
 
-## Required Environment Variables
-Set at least the JWT secret before running:
-
-Windows PowerShell:
+## Environment Variables
+Optional overrides:
 ```powershell
 $env:JWT_SECRET="replace-with-strong-secret-at-least-32-chars"
-```
-
-Optional:
-```powershell
 $env:JWT_EXPIRATION_MS="3600000"
+$env:SERVER_PORT="8081"
 ```
 
 ## Run Locally
@@ -49,10 +45,34 @@ cd notes
 
 Base URL: `http://localhost:8080/api`
 
+If port `8080` is already busy:
+```powershell
+cd notes
+$env:SERVER_PORT="8081"
+.\gradlew.bat bootRun
+```
+
 ## Run Tests
 ```bash
 cd notes
 ./gradlew clean test
+```
+
+## Docker
+Build image:
+```bash
+cd notes
+docker build -t notes-api .
+```
+
+Run container:
+```bash
+docker run --rm -p 8080:8080 -e JWT_SECRET=replace-with-strong-secret-at-least-32-chars notes-api
+```
+
+If port `8080` is busy on your machine:
+```bash
+docker run --rm -p 8081:8080 notes-api
 ```
 
 ## API Documentation

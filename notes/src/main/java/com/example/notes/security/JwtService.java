@@ -30,8 +30,8 @@ public class JwtService {
             @Value("${security.jwt.secret}") String secret,
             @Value("${security.jwt.expiration-ms}") long expirationMs
     ) {
-        if (!StringUtils.hasText(secret) || secret.startsWith("SET_JWT_SECRET_IN_ENVIRONMENT")) {
-            throw new IllegalStateException("JWT secret is not configured. Set JWT_SECRET environment variable.");
+        if (!StringUtils.hasText(secret)) {
+            throw new IllegalStateException("JWT secret is not configured.");
         }
         // Key must be at least 256 bits (32 bytes) for HS256
         if (secret.length() < 32) {

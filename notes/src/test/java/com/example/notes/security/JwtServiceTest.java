@@ -33,8 +33,8 @@ class JwtServiceTest {
     }
 
     @Test
-    void constructor_shouldFailFastWhenSecretIsPlaceholder() {
-        assertThatThrownBy(() -> new JwtService("SET_JWT_SECRET_IN_ENVIRONMENT_MIN_32_CHARS", expirationMs))
+    void constructor_shouldFailFastWhenSecretIsBlank() {
+        assertThatThrownBy(() -> new JwtService("", expirationMs))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("JWT secret is not configured");
     }

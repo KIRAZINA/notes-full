@@ -7,11 +7,11 @@ spring:
       write-dates-as-timestamps: false
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 security:
   jwt:
-    secret: ${JWT_SECRET:SET_JWT_SECRET_IN_ENVIRONMENT_MIN_32_CHARS}
+    secret: ${JWT_SECRET:local-dev-jwt-secret-at-least-32-chars}
     expiration-ms: ${JWT_EXPIRATION_MS:3600000}
 
 logging:
