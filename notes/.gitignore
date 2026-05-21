@@ -1,51 +1,40 @@
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+# Maven / build
+target/
+**/target/
+.mvn/
+*.log
+bootrun-*.err.log
+bootrun-*.out.log
+out.txt
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
+# IDE files
+.idea/
 *.iml
+*.iws
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
 .vscode/
 
-### Mac OS ###
-.DS_Store
+# Java artifacts
+*.class
+*.jar
+*.war
+*.ear
 
-/build/
-/out/
-/.gradle/
-/*.iml
-/.idea/
-*.log
-application-prod.yml
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Local Maven repo
+.m2repo/
+
+# Secrets
 *.keystore
+*.pem
+*.key
+*credentials*
+secrets.json

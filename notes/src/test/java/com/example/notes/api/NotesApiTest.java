@@ -67,7 +67,7 @@ public class NotesApiTest extends BaseApiTest {
             }
             """;
 
-        createdNoteId = withAuth()
+        Number idValue = withAuth()
                 .body(requestBody)
                 .contentType(ContentType.JSON)
                 .when()
@@ -83,6 +83,7 @@ public class NotesApiTest extends BaseApiTest {
                 .body("data.trashed", equalTo(false))
                 .extract()
                 .path("data.id");
+        createdNoteId = idValue.longValue();
     }
 
     /**
@@ -147,8 +148,8 @@ public class NotesApiTest extends BaseApiTest {
                 .statusCode(200)
                 .body("success", equalTo(true))
                 .body("data.content", is(notNullValue()))
-                .body("data.number", notNullValue())
-                .body("data.size", notNullValue())
+                .body("data.pageNumber", notNullValue())
+                .body("data.pageSize", notNullValue())
                 .body("data.totalElements", notNullValue())
                 .body("data.totalPages", notNullValue());
     }
@@ -406,8 +407,8 @@ public class NotesApiTest extends BaseApiTest {
                 .then()
                 .statusCode(200)
                 .body("success", equalTo(true))
-                .body("data.size", equalTo(5))
-                .body("data.number", equalTo(0));
+                .body("data.pageSize", equalTo(5))
+                .body("data.pageNumber", equalTo(0));
     }
 
     /**

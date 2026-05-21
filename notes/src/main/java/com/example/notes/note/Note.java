@@ -14,6 +14,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "notes")
+@NamedEntityGraph(name = "Note.withTags", attributeNodes = @NamedAttributeNode("tags"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,6 +25,9 @@ public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    private Long version;
 
     // Owner of the note
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,4 +58,18 @@ public class Note {
     @Builder.Default
     private Set<Tag> tags = new HashSet<>();
 
+    @PrePersist
+    @PreUpdate
+    private void normalizeState() {
+        if (trashed) {
+            pinned = false;
+            archived = false;
+        }
+        if (archived) {
+            pinned = false;
+        }
+        if (pinned && (archived || trashed)) {
+            throw new IllegalArgumentException("A pinned note cannot be archived or trashed");
+        }
+    }
 }

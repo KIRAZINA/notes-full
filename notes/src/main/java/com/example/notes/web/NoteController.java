@@ -2,7 +2,7 @@ package com.example.notes.web;
 
 import com.example.notes.note.Note;
 import com.example.notes.note.NoteService;
-import com.example.notes.user.AppUserDetails;
+import com.example.notes.user.CurrentUserResolver;
 import com.example.notes.web.dto.*;
 
 import com.example.notes.web.mapper.NoteMapper;
@@ -25,10 +25,12 @@ public class NoteController {
 
     private final NoteService noteService;
     private final NoteMapper noteMapper;
+    private final CurrentUserResolver currentUserResolver;
 
-    public NoteController(NoteService noteService, NoteMapper noteMapper) {
+    public NoteController(NoteService noteService, NoteMapper noteMapper, CurrentUserResolver currentUserResolver) {
         this.noteService = noteService;
         this.noteMapper = noteMapper;
+        this.currentUserResolver = currentUserResolver;
     }
 
     /**
@@ -36,15 +38,18 @@ public class NoteController {
      */
     @GetMapping
     public ApiResponse<PageResponse<NoteResponse>> list(
-            @AuthenticationPrincipal AppUserDetails principal,
+            @AuthenticationPrincipal Object principal,
             Pageable pageable,
             @RequestParam(required = false) Boolean archived,
             @RequestParam(required = false) Boolean trashed,
             @RequestParam(required = false) Boolean pinned,
             @RequestParam(required = false) String q,
+            @RequestParam(required = false) Boolean searchInContent,
             @RequestParam(required = false) List<Long> tagIds
     ) {
-        var page = noteService.listNotes(principal.getId(), pageable, archived, trashed, pinned, q, true, tagIds);
+        Long ownerId = currentUserResolver.resolveUserId(principal);
+        boolean includeContent = searchInContent == null || searchInContent;
+        var page = noteService.listNotes(ownerId, pageable, archived, trashed, pinned, q, includeContent, tagIds);
         var content = page.map(noteMapper::toResponse).getContent();
         var response = new PageResponse<>(
                 content,
@@ -61,10 +66,11 @@ public class NoteController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<NoteResponse>> create(
-            @AuthenticationPrincipal AppUserDetails principal,
+            @AuthenticationPrincipal Object principal,
             @RequestBody @Valid NoteCreateRequest req
     ) {
-        var note = noteService.createNote(principal.getId(), req.title(), req.content());
+        Long ownerId = currentUserResolver.resolveUserId(principal);
+        var note = noteService.createNote(ownerId, req.title(), req.content());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok(noteMapper.toResponse(note)));
     }
@@ -74,10 +80,11 @@ public class NoteController {
      */
     @GetMapping("/{id}")
     public ApiResponse<NoteResponse> get(
-            @AuthenticationPrincipal AppUserDetails principal,
+            @AuthenticationPrincipal Object principal,
             @PathVariable Long id
     ) {
-        return ApiResponse.ok(noteMapper.toResponse(noteService.getNote(principal.getId(), id)));
+        Long ownerId = currentUserResolver.resolveUserId(principal);
+        return ApiResponse.ok(noteMapper.toResponse(noteService.getNote(ownerId, id)));
     }
 
     /**
@@ -85,12 +92,13 @@ public class NoteController {
      */
     @PutMapping("/{id}")
     public ApiResponse<NoteResponse> update(
-            @AuthenticationPrincipal AppUserDetails principal,
+            @AuthenticationPrincipal Object principal,
             @PathVariable Long id,
             @RequestBody @Valid NoteUpdateRequest req
     ) {
+        Long ownerId = currentUserResolver.resolveUserId(principal);
         var note = noteService.updateNote(
-                principal.getId(), id,
+                ownerId, id,
                 req.title(), req.content(),
                 req.pinned(), req.archived(), req.trashed()
         );
@@ -102,10 +110,11 @@ public class NoteController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(
-            @AuthenticationPrincipal AppUserDetails principal,
+            @AuthenticationPrincipal Object principal,
             @PathVariable Long id
     ) {
-        noteService.deleteNote(principal.getId(), id);
+        Long ownerId = currentUserResolver.resolveUserId(principal);
+        noteService.deleteNote(ownerId, id);
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

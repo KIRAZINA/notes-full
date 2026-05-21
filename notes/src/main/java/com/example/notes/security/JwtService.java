@@ -10,7 +10,9 @@ import org.springframework.util.StringUtils;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Generates and validates JWT tokens.
@@ -55,20 +57,28 @@ public class JwtService {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expirationMs);
         return Jwts.builder()
+                .setId(UUID.randomUUID().toString())
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(exp)
-                // Minimal claims - don't add roles or other data here
+                // Minimal claims - keep token small while enabling revocation by JTI
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     /**
      * Extract username from JWT token.
-     * This is the only claim stored in token.
      */
     public String extractUsername(String token) {
         return parseClaims(token).getBody().getSubject();
+    }
+
+    public String extractTokenId(String token) {
+        return parseClaims(token).getBody().getId();
+    }
+
+    public Instant extractExpiration(String token) {
+        return parseClaims(token).getBody().getExpiration().toInstant();
     }
 
     /**
@@ -89,7 +99,7 @@ public class JwtService {
      * Throws exception if token is invalid or expired.
      */
     private Jws<Claims> parseClaims(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);

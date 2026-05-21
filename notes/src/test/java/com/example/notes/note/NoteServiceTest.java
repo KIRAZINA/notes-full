@@ -51,7 +51,7 @@ class NoteServiceTest {
     @Test
     void addTag_shouldAddTagAndSave() {
         User user = User.builder().id(1L).build();
-        Note note = Note.builder().id(10L).owner(user).tags(Set.of()).build();
+        Note note = Note.builder().id(10L).owner(user).tags(new java.util.HashSet<>()).build();
 
         when(noteRepository.findById(10L)).thenReturn(Optional.of(note));
         when(tagService.getOwnedTagOrThrow(1L, 5L)).thenReturn(Tag.builder().id(5L).ownerId(1L).name("tag").build());

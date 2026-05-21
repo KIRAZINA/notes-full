@@ -59,6 +59,37 @@ public class UserService implements org.springframework.security.core.userdetail
                 .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
+    public User changePassword(Long id, String oldPassword, String newPassword) {
+        if (oldPassword == null || oldPassword.isBlank() || newPassword == null || newPassword.isBlank()) {
+            throw new IllegalArgumentException("Both old and new passwords are required");
+        }
+        User user = getByIdOrThrow(id);
+        if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Invalid current password");
+        }
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
+    public User changeEmail(Long id, String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email cannot be blank");
+        }
+        userRepository.findByEmail(email)
+                .filter(existing -> !existing.getId().equals(id))
+                .ifPresent(existing -> {
+                    throw new ConflictException("Email already taken");
+                });
+        User user = getByIdOrThrow(id);
+        user.setEmail(email);
+        return userRepository.save(user);
+    }
+
+    public void deleteUser(Long id) {
+        User user = getByIdOrThrow(id);
+        userRepository.delete(user);
+    }
+
     @Override
     public AppUserDetails loadUserByUsername(String username) throws NotFoundException {
         return new AppUserDetails(findByUsernameOrThrow(username));

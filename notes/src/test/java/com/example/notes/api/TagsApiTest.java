@@ -63,7 +63,7 @@ public class TagsApiTest extends BaseApiTest {
             }
             """;
 
-        testNoteId = withAuth()
+        Number noteIdValue = withAuth()
                 .body(noteBody)
                 .contentType(ContentType.JSON)
                 .when()
@@ -72,6 +72,7 @@ public class TagsApiTest extends BaseApiTest {
                 .statusCode(201)
                 .extract()
                 .path("data.id");
+        testNoteId = noteIdValue.longValue();
     }
 
     /**
@@ -87,7 +88,7 @@ public class TagsApiTest extends BaseApiTest {
             }
             """;
 
-        createdTagId = withAuth()
+        Number idValue = withAuth()
                 .body(requestBody)
                 .contentType(ContentType.JSON)
                 .when()
@@ -99,6 +100,7 @@ public class TagsApiTest extends BaseApiTest {
                 .body("data.name", equalTo("Important"))
                 .extract()
                 .path("data.id");
+        createdTagId = idValue.longValue();
     }
 
     /**
@@ -310,7 +312,7 @@ public class TagsApiTest extends BaseApiTest {
             }
             """;
 
-        Long newTagId = withAuth()
+        Number newTagIdValue = withAuth()
                 .body(newTagBody)
                 .contentType(ContentType.JSON)
                 .when()
@@ -319,6 +321,7 @@ public class TagsApiTest extends BaseApiTest {
                 .statusCode(201)
                 .extract()
                 .path("data.id");
+        Long newTagId = newTagIdValue.longValue();
 
         // Now set tags on note
         String requestBody = String.format("""
@@ -368,7 +371,7 @@ public class TagsApiTest extends BaseApiTest {
             }
             """;
 
-        Long tagToDelete = withAuth()
+        Number tagToDeleteValue = withAuth()
                 .body(tagBody)
                 .contentType(ContentType.JSON)
                 .when()
@@ -377,6 +380,7 @@ public class TagsApiTest extends BaseApiTest {
                 .statusCode(201)
                 .extract()
                 .path("data.id");
+        Long tagToDelete = tagToDeleteValue.longValue();
 
         // Delete it
         withAuth()

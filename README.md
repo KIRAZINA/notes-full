@@ -1,61 +1,42 @@
 # Notes API (Backend Only)
 
-A backend-only note management service built with Java and Spring Boot.
+A simple Java backend for notes, tags, and JWT authentication.
 
-## What This Project Includes
-- JWT-based authentication (`/api/auth/register`, `/api/auth/login`, `/api/auth/me`)
-- Notes CRUD + archive/trash operations
-- Tag CRUD + note-tag relations
-- Unified API response format (`ApiResponse`)
-- Centralized error handling
-- Brute-force login protection
-- Integration + API tests
+## Project Contents
+- Spring Boot 3.3.5 backend in `notes/`
+- JWT authentication for API access
+- Notes CRUD, archive/trash, and tag relationships
+- Centralized API responses and error handling
+- Integration and API tests
 
 ## Tech Stack
-- Java 17
-- Spring Boot 3.1.5
-- Spring Security (JWT-only)
+- Java 21
+- Spring Boot 3.3.5
+- Spring Security JWT
 - Spring Data JPA / Hibernate
-- Flyway migrations
-- H2 (dev), PostgreSQL (runtime option)
-- Gradle Wrapper
+- H2 for development, PostgreSQL supported
+- Maven Wrapper
 - Docker
-
-## Security Model
-- Bearer token auth only (no HTTP Basic)
-- JWT secret can be overridden from environment variables
-- Local development has a valid default JWT secret
-- Unified JSON security errors:
-  - `401` -> `error.code = "unauthorized"`
-  - `403` -> `error.code = "forbidden"`
-
-## Environment Variables
-Optional overrides:
-```powershell
-$env:JWT_SECRET="replace-with-strong-secret-at-least-32-chars"
-$env:JWT_EXPIRATION_MS="3600000"
-$env:SERVER_PORT="8081"
-```
 
 ## Run Locally
 ```bash
 cd notes
-./gradlew bootRun
+./mvnw spring-boot:run
 ```
 
-Base URL: `http://localhost:8080/api`
-
-If port `8080` is already busy:
+On Windows:
 ```powershell
 cd notes
-$env:SERVER_PORT="8081"
-.\gradlew.bat bootRun
+.\mvnw.cmd spring-boot:run
 ```
+
+Default base URL:
+`http://localhost:8080/api`
 
 ## Run Tests
 ```bash
 cd notes
-./gradlew clean test
+./mvnw clean test
 ```
 
 ## Docker
@@ -70,16 +51,15 @@ Run container:
 docker run --rm -p 8080:8080 -e JWT_SECRET=replace-with-strong-secret-at-least-32-chars notes-api
 ```
 
-If port `8080` is busy on your machine:
-```bash
-docker run --rm -p 8081:8080 notes-api
+## Environment Variables
+Optional overrides:
+```powershell
+$env:JWT_SECRET="replace-with-strong-secret-at-least-32-chars"
+$env:JWT_EXPIRATION_MS="3600000"
+$env:SERVER_PORT="8081"
 ```
 
-## API Documentation
-- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
-- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
-
-## Main Endpoints
+## API Overview
 ### Auth
 - `POST /api/auth/register`
 - `POST /api/auth/login`
@@ -106,7 +86,12 @@ docker run --rm -p 8081:8080 notes-api
 - `DELETE /api/notes/{id}/tags/{tagId}`
 - `PUT /api/notes/{id}/tags`
 
+## Docs
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI: `http://localhost:8080/v3/api-docs`
+
 ## Project Layout
-- `notes/` Spring Boot backend code
-- `README.md` Root project documentation
-- `.gitignore`
+- `notes/` Spring Boot source and Maven project
+- `README.md` project documentation
+- `.gitignore` ignore rules for temporary files and build outputs
+

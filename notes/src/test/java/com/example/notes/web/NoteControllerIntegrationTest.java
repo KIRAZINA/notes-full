@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.springframework.test.context.TestPropertySource(properties = "test.security.mock=true")
 class NoteControllerIntegrationTest {
 
     @Autowired
@@ -24,13 +25,13 @@ class NoteControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @WithMockUser(username = "testuser", roles = {"USER"})
     void createNote_shouldReturn201AndNote() throws Exception {
         NoteCreateRequest request = new NoteCreateRequest("Integration test note", "Some content");
 
         mockMvc.perform(post("/api/notes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .header("Authorization", "Bearer test-jwt-token"))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.title").value("Integration test note"));

@@ -1,7 +1,6 @@
 package com.example.notes.note;
 
 import com.example.notes.common.NotFoundException;
-import com.example.notes.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +14,9 @@ import java.time.Instant;
 public class NoteActionService {
 
     private final NoteRepository noteRepository;
-    private final UserService userService;
 
-    public NoteActionService(NoteRepository noteRepository, UserService userService) {
+    public NoteActionService(NoteRepository noteRepository) {
         this.noteRepository = noteRepository;
-        this.userService = userService;
     }
 
     private Note loadOwned(Long ownerId, Long noteId) {
@@ -33,7 +30,11 @@ public class NoteActionService {
 
     public Note moveToArchive(Long ownerId, Long noteId) {
         Note note = loadOwned(ownerId, noteId);
+        if (note.isTrashed()) {
+            throw new IllegalArgumentException("Cannot archive a trashed note");
+        }
         note.setArchived(true);
+        note.setPinned(false);
         note.setUpdatedAt(Instant.now());
         return noteRepository.save(note);
     }
@@ -48,6 +49,8 @@ public class NoteActionService {
     public Note moveToTrash(Long ownerId, Long noteId) {
         Note note = loadOwned(ownerId, noteId);
         note.setTrashed(true);
+        note.setArchived(false);
+        note.setPinned(false);
         note.setUpdatedAt(Instant.now());
         return noteRepository.save(note);
     }

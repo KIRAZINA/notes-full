@@ -1,11 +1,13 @@
 package com.example.notes.audit;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
 /**
- * Service to record audit events.
+ * Service to record audit events asynchronously to avoid blocking request threads.
  */
 @Service
 public class AuditService {
@@ -16,6 +18,8 @@ public class AuditService {
         this.repository = repository;
     }
 
+    @Async
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public void record(Long userId, String action, String entityType, Long entityId, String description) {
         AuditLog log = AuditLog.builder()
                 .userId(userId)

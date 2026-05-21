@@ -46,6 +46,9 @@ public class NoteService {
         if (content == null || content.isBlank()) {
             throw new IllegalArgumentException("Content cannot be empty");
         }
+        if (content.length() > 100_000) {
+            throw new IllegalArgumentException("Content must not exceed 100,000 characters");
+        }
         
         User owner = userService.getByIdOrThrow(ownerId);
         Note note = Note.builder()
@@ -70,32 +73,18 @@ public class NoteService {
                                 List<Long> tagIds) {
         User owner = userService.getByIdOrThrow(ownerId);
 
-        // Priority: process filters in order
-        if (archived != null) {
-            return noteRepository.findByOwnerAndArchived(owner, archived, pageable);
-        }
-        if (trashed != null) {
-            return noteRepository.findByOwnerAndTrashed(owner, trashed, pageable);
-        }
-        if (pinned != null) {
-            return noteRepository.findByOwnerAndPinned(owner, pinned, pageable);
+        var spec = NoteSpecifications.withOwner(owner)
+                .and(NoteSpecifications.withArchived(archived))
+                .and(NoteSpecifications.withTrashed(trashed))
+                .and(NoteSpecifications.withPinned(pinned))
+                .and(NoteSpecifications.withQuery(query, searchInContent))
+                .and(NoteSpecifications.withAllTagIds(tagIds));
+
+        if (archived == null && trashed == null) {
+            spec = spec.and(NoteSpecifications.withArchived(false)).and(NoteSpecifications.withTrashed(false));
         }
 
-        // Filter by tags (if provided and not empty)
-        if (tagIds != null && !tagIds.isEmpty()) {
-            if (tagIds.size() == 1) {
-                return noteRepository.findByOwnerAndTagId(owner, tagIds.get(0), pageable);
-            }
-            return noteRepository.findByOwnerAndAllTagIds(owner, tagIds, tagIds.size(), pageable);
-        }
-
-        // Combined search (title + content)
-        if (query != null && !query.isBlank()) {
-            return noteRepository.searchTitleOrContent(owner, query, pageable);
-        }
-
-        // Default: return all notes for owner
-        return noteRepository.findByOwner(owner, pageable);
+        return noteRepository.findAll(spec, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -113,7 +102,12 @@ public class NoteService {
         ensureOwner(ownerId, note);
 
         if (title != null) note.setTitle(title);
-        if (content != null) note.setContent(content);
+        if (content != null) {
+            if (content.length() > 100_000) {
+                throw new IllegalArgumentException("Content must not exceed 100,000 characters");
+            }
+            note.setContent(content);
+        }
         if (pinned != null) note.setPinned(pinned);
         if (archived != null) note.setArchived(archived);
         if (trashed != null) note.setTrashed(trashed);
@@ -128,8 +122,12 @@ public class NoteService {
         Note note = noteRepository.findById(noteId)
                 .orElseThrow(() -> new NotFoundException("Note not found"));
         ensureOwner(ownerId, note);
-        noteRepository.delete(note);
-        auditService.record(ownerId, "DELETE_NOTE", "NOTE", noteId, "Deleted note");
+        note.setTrashed(true);
+        note.setArchived(false);
+        note.setPinned(false);
+        note.setUpdatedAt(Instant.now());
+        noteRepository.save(note);
+        auditService.record(ownerId, "NOTE_TRASHED", "NOTE", noteId, "Moved note to trash");
     }
 
     public Note addTag(Long ownerId, Long noteId, Long tagId) {
@@ -164,6 +162,9 @@ public class NoteService {
     public Note setTags(Long ownerId, Long noteId, List<Long> tagIds) {
         if (tagIds == null) {
             throw new IllegalArgumentException("Tag IDs list cannot be null");
+        }
+        if (tagIds.size() > 50) {
+            throw new IllegalArgumentException("Cannot assign more than 50 tags at once");
         }
         if (tagIds.isEmpty()) {
             // Allow empty tags - clears all tags from note

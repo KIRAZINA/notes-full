@@ -2,6 +2,7 @@ package com.example.notes.security;
 
 import com.example.notes.user.AppUserDetails;
 import com.example.notes.user.UserService;
+import com.example.notes.security.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,12 +24,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserService userService;
+    private final TokenBlacklistService tokenBlacklistService;
 
 
 
-    public JwtAuthFilter(JwtService jwtService, UserService userService) {
+    public JwtAuthFilter(JwtService jwtService, UserService userService, TokenBlacklistService tokenBlacklistService) {
         this.jwtService = jwtService;
         this.userService = userService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
         String token = resolveToken(request);
-        if (token != null && jwtService.isValid(token)) {
+        if (token != null && jwtService.isValid(token) && !tokenBlacklistService.isBlacklisted(token)) {
             String username = jwtService.extractUsername(token);
             AppUserDetails userDetails = userService.loadUserByUsername(username);
 

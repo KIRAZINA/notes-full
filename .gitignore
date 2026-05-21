@@ -1,37 +1,33 @@
-# IDE and Editor
+# IDE and editor
 .idea/
 .vscode/
 *.iml
 *.iws
 *.ipr
+
+# Build outputs
+target/
+build/
+out/
+
+# Maven
+.mvn/
+**/target/
+**/.m2repo/
+
+# Logs and temporary files
+*.log
+logs/
+bootrun-*.err.log
+bootrun-*.out.log
+out.txt
+*.tmp
+*.bak
 *.swp
 *.swo
 *~
-.DS_Store
 
-# Internal documentation (not for GitHub)
-BUGFIXES_REPORT.md
-COMPLETION_SUMMARY.md
-FINAL_REPORT.md
-LOCALIZATION_REPORT.md
-RUNNING_INSTRUCTIONS.md
-GITHUB_DEPLOYMENT_CHECKLIST.md
-
-# Build and Gradle
-build/
-.gradle/
-notes/.gradle-home/
-gradle-app.setting
-!gradle-wrapper.jar
-.gradletasknamecache
-
-# Maven
-target/
-.mvn/
-*.jar
-!gradle/wrapper/gradle-wrapper.jar
-
-# Java
+# Java artifacts
 *.class
 *.jar
 *.war
@@ -40,75 +36,20 @@ target/
 *.tar.gz
 *.rar
 
-# Node (if frontend uses Node)
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Log files
-*.log
-logs/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-*.h2.db
-application-prod.yml
-*.keystore
-
-# Environment
+# Environment files
 .env
 .env.local
 .env.*.local
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Project
-out/
-bin/
-dist/
-
-# Temporary files
-*.tmp
-*.bak
-*.swp
-*.swo
-*~
-
-# IntelliJ
-.idea/
-*.iml
-*.iws
-*.ipr
-out/
-
-# Eclipse
-.classpath
-.project
-.settings/
-.apt_generated
-
-# VS Code
-.vscode/
-.history/
-
-# Ignored directories
-node_modules/
-dist/
-coverage/
-
-# Production files
-.next/
-.nuxt/
-.cache/
-.vuepress/dist/
-
 # Secrets
-.ssh/
+*.keystore
 *.pem
 *.key
-.credentials/
+*credentials*
 secrets.json
+.idea/
+.github/

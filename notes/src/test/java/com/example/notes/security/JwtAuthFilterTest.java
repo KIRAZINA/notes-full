@@ -1,5 +1,6 @@
 package com.example.notes.security;
 
+import com.example.notes.security.TokenBlacklistService;
 import com.example.notes.user.AppUserDetails;
 import com.example.notes.user.User;
 import com.example.notes.user.UserService;
@@ -22,8 +23,9 @@ class JwtAuthFilterTest {
 
     private final JwtService jwtService = mock(JwtService.class);
     private final UserService userService = mock(UserService.class);
+    private final TokenBlacklistService tokenBlacklistService = mock(TokenBlacklistService.class);
 
-    private final JwtAuthFilter filter = new JwtAuthFilter(jwtService, userService);
+    private final JwtAuthFilter filter = new JwtAuthFilter(jwtService, userService, tokenBlacklistService);
 
     @AfterEach
     void clearContext() {
